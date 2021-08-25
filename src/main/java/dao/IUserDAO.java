@@ -17,4 +17,13 @@ public interface IUserDAO {
     public boolean deleteUser(int id) throws SQLException;
 
     public boolean updateUser(User user) throws SQLException;
+
+    //bo sung bai tap bai 12:
+    public List<User> findByCountry (String country) throws SQLException;
+    public List<User> softByName();
+
+
+    //Bo sung thuc hanh bai 13:
+    User getUserById(int id);
+    void insertUserStore(User user) throws SQLException;
 }

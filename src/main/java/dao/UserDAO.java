@@ -16,7 +16,9 @@ public class UserDAO implements IUserDAO {
     private static final String SELECT_USER_BY_ID = "select id,name,email,country from users where id =?";
     private static final String SELECT_ALL_USERS = "select * from users";
     private static final String DELETE_USERS_SQL = "delete from users where id = ?;";
-    private static final String UPDATE_USERS_SQL = "update users set name = ?,email= ?, country =? where id = ?;";
+    private static final String UPDATE_USERS_SQL = "update users set name = ?,email= ?, country =? where id = ?";
+    private static final String SELECT_USER_BY_COUNTRY = "select * from users where id = ?";
+    private static final String SELECT_ALL_USERS_SORT = "select * from users order by  name ";
 
     public UserDAO() {
     }
@@ -46,10 +48,11 @@ public class UserDAO implements IUserDAO {
             System.out.println(preparedStatement);
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
-           printSQLException(e);
+            printSQLException(e);
         }
     }
-@Override
+
+    @Override
     public User selectUser(int id) {
         User user = null;
         try (Connection connection = getConnection();
@@ -69,7 +72,8 @@ public class UserDAO implements IUserDAO {
         }
         return user;
     }
-@Override
+
+    @Override
     public List<User> selectAllUsers() {
 
 
@@ -93,7 +97,8 @@ public class UserDAO implements IUserDAO {
         }
         return users;
     }
-@Override
+
+    @Override
     public boolean deleteUser(int id) throws SQLException {
         boolean rowDeleted;
         try (Connection connection = getConnection(); PreparedStatement statement = connection.prepareStatement(DELETE_USERS_SQL);) {
@@ -102,7 +107,8 @@ public class UserDAO implements IUserDAO {
         }
         return rowDeleted;
     }
-@Override
+
+    @Override
     public boolean updateUser(User user) throws SQLException {
         boolean rowUpdated;
         try (Connection connection = getConnection(); PreparedStatement statement = connection.prepareStatement(UPDATE_USERS_SQL);) {
@@ -114,6 +120,77 @@ public class UserDAO implements IUserDAO {
             rowUpdated = statement.executeUpdate() > 0;
         }
         return rowUpdated;
+    }
+
+    @Override
+    public List<User> findByCountry(String country) throws SQLException {
+        List<User> users = new ArrayList<>();
+        Connection connection = getConnection();
+        PreparedStatement statement = connection.prepareStatement(SELECT_USER_BY_COUNTRY);
+        return null;
+    }
+
+    @Override
+    public List<User> softByName() {
+        return null;
+    }
+
+    @Override
+    public User getUserById(int id) {
+        User user = null;
+        String query = "{CALL get_user_by_id(?)}";
+        try (Connection connection = getConnection();
+
+             CallableStatement callableStatement = connection.prepareCall(query);) {
+
+            callableStatement.setInt(1, id);
+
+            ResultSet rs = callableStatement.executeQuery();
+
+
+            while (rs.next()) {
+
+                String name = rs.getString("name");
+
+                String email = rs.getString("email");
+
+                String country = rs.getString("country");
+
+                user = new User(id, name, email, country);
+
+            }
+
+        } catch (SQLException e) {
+
+            printSQLException(e);
+
+        }
+
+        return user;
+
+    }
+
+
+    @Override
+    public void insertUserStore(User user) throws SQLException {
+        String query = "{CALL insert_user(?,?,?)}";
+
+        Connection connection = getConnection();
+
+        CallableStatement callableStatement = connection.prepareCall(query);
+
+
+        callableStatement.setString(1, user.getName());
+
+        callableStatement.setString(2, user.getEmail());
+
+        callableStatement.setString(3, user.getCountry());
+
+        System.out.println(callableStatement);
+
+        callableStatement.executeUpdate();
+
+
     }
 
     private void printSQLException(SQLException ex) {
@@ -131,6 +208,8 @@ public class UserDAO implements IUserDAO {
             }
         }
     }
+
+
 }
 
 
