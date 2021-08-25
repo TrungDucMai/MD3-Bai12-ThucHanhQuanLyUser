@@ -26,4 +26,5 @@ public interface IUserDAO {
     //Bo sung thuc hanh bai 13:
     User getUserById(int id);
     void insertUserStore(User user) throws SQLException;
+    void addUserTransaction(User user, int[] permision);
 }

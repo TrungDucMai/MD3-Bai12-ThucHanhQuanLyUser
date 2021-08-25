@@ -7,6 +7,7 @@ import javax.servlet.*;
 import javax.servlet.http.*;
 import javax.servlet.annotation.*;
 import java.io.IOException;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -33,11 +34,33 @@ public class UserServlet extends HttpServlet {
                 case "edit":
                     updateUser(request, response);
                     break;
+                case "search":
+                    showFindByCountry(request, response);
             }
         } catch (SQLException ex) {
             throw new ServletException(ex);
         }
     }
+
+    private void showFindByCountry(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException, SQLException {
+        String country = request.getParameter("country");
+        List<User> listUser = userDAO.findByCountry(country);
+        request.setAttribute("ListUser", listUser);
+        RequestDispatcher requestDispatcher = request.getRequestDispatcher("user/findByCountry.jsp");
+        requestDispatcher.forward(request,response);
+
+
+
+
+    }
+//    private void searchByContry(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+//        String country = request.getParameter("country");
+//        List<User> listUser = userDAO.selectUsersByContry(country);
+//        request.setAttribute("listUser", listUser);
+//        RequestDispatcher dispatcher = request.getRequestDispatcher("view/list.jsp");
+//        dispatcher.forward(request, response);
+//    }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -57,6 +80,12 @@ public class UserServlet extends HttpServlet {
                 case "delete":
                     deleteUser(request, response);
                     break;
+                case "permision":
+
+                    addUserPermision(request, response);
+
+                    break;
+
                 default:
                     listUser(request, response);
                     break;
@@ -64,6 +93,15 @@ public class UserServlet extends HttpServlet {
         } catch (SQLException ex) {
             throw new ServletException(ex);
         }
+    }
+
+    private void addUserPermision(HttpServletRequest request, HttpServletResponse response) {
+
+        User user = new User("quan", "quan.nguyen@codegym.vn", "vn");
+
+        int[] permision = {1, 2, 4};
+
+        userDAO.addUserTransaction(user, permision);
     }
 
     private void listUser(HttpServletRequest request, HttpServletResponse response)
